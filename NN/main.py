@@ -94,8 +94,8 @@ def test(dataloader, model, loss_fn):
             test_loss += loss.item()
             wrong += abs(label.item() - round(prediction.item()))
     test_loss /= len(dataloader)
-    error = wrong/len(dataloader)
-    return test_loss, 
+    test_error = wrong/len(dataloader)
+    return test_loss, test_error
 
 # input should be a single column of S
 def bestValue(S, empty_indicator=None):
@@ -217,7 +217,7 @@ def main():
     nn_test_dataloader = DataLoader(nn_test_data, shuffle=True)
 
     nn_input_width = len(pd_test_data.columns)
-    nn_width = [10, 50, 100, 200]
+    nn_width = [10, 50]
     nn_depth = [3,5,9]
     EPOCHS = 20
     activation = 'tanh'
@@ -238,7 +238,7 @@ def main():
             prev_train_errors = 0
             for i in range(0,EPOCHS):
                 train(nn_train_dataloader, model=model, loss_fn=loss_fn, optimizer=optimizer)
-                train_error = test(nn_train_dataloader, model=model, loss_fn=loss_fn)
+                train_loss, train_error = test(nn_train_dataloader, model=model, loss_fn=loss_fn)
                 train_errors = np.append(train_errors, train_error)
                 if i%10 == 0: print('.',end="",flush=True)
                 if (abs(prev_train_errors - train_errors[i]) < .001 and i >= 20): break
