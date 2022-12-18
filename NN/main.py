@@ -217,9 +217,9 @@ def main():
     nn_test_dataloader = DataLoader(nn_test_data, shuffle=True)
 
     nn_input_width = len(pd_test_data.columns)
-    nn_width = [10, 50]
-    nn_depth = [3,5,9]
-    EPOCHS = 20
+    nn_width = [10]
+    nn_depth = [5]
+    EPOCHS = 100
     activation = 'tanh'
 
     final_train_errors = np.zeros((len(nn_width), len(nn_depth)))
@@ -241,7 +241,7 @@ def main():
                 train_loss, train_error = test(nn_train_dataloader, model=model, loss_fn=loss_fn)
                 train_errors = np.append(train_errors, train_error)
                 if i%10 == 0: print('.',end="",flush=True)
-                if (abs(prev_train_errors - train_errors[i]) < .001 and i >= 20): break
+                #if (abs(prev_train_errors - train_errors[i]) < .001 and i >= 20): break
                 prev_train_errors = train_errors[i]
             print(' done, time: ' + str(time() - tic), flush=True)
             f = plt.figure(0)
@@ -250,14 +250,14 @@ def main():
             plt.xlabel("Epochs")
             plt.ylabel("Error (MSE Loss)")
             plt.legend()
-            file_name = activation + 'nn_bonus_w' + str(width) + '_d' + str(depth)
+            file_name = activation + '_nn_w' + str(width) + '_d' + str(depth)
             plt.savefig(file_name)
             plt.close(0)
-            np.savetxt(file_name+'_train.csv', train_errors, fmt='%.6f', delimiter=',')
-            final_train_errors[w,d] = train_errors[-1]
-            np.savetxt(file_name+'_final_train_errors.csv', final_train_errors, fmt='%.6f', delimiter=',')
+            np.savetxt(file_name + '_train.csv', train_errors, fmt='%.6f', delimiter=',')
+            final_train_errors[w, d] = train_errors[-1]
             print(' done, time: ' + str(time() - tic), flush=True)
-            torch.save(model, "w" + str(w) + "_d" + str(d) + ".pth")
+            torch.save(model, "w" + str(width) + "_d" + str(depth) + ".pth")
+    np.savetxt('final_train_errors.csv', final_train_errors, fmt='%.6f', delimiter=',')
     return
 
 
