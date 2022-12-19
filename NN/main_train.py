@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-import os
 from time import time
 import matplotlib.pyplot as plt
 
@@ -199,24 +198,17 @@ def main():
         'label': {0,1}
         }
     kaggle_train_filepath = 'train_final.csv'
-    kaggle_test_filepath = 'test_final.csv'
     
     pd_training_data = importData(kaggle_train_filepath, attrib_values=attrib_values, attribs=None, discrete_attribs=discrete_attribs, index_col=False, empty_indicator='?', change_label=None)
     del attrib_values['label'] # remove the label as a valid attribute
     pd_training_data = convertDiscrete(pd_training_data, discrete_attribs=discrete_attribs, attrib_values=attrib_values)
     pd_training_data = normalizeContinous(pd_training_data, continous_attribs=continous_attribs)
 
-    pd_test_data = importData(kaggle_test_filepath, attrib_values, attribs=None, discrete_attribs=discrete_attribs, index_col=0, empty_indicator='?', change_label=None)
-    pd_test_data = convertDiscrete(pd_test_data, discrete_attribs=discrete_attribs, attrib_values=attrib_values)
-    pd_test_data = normalizeContinous(pd_test_data, continous_attribs=continous_attribs)
-
     # https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
     nn_training_data = income_info(pd_training_data)
     nn_train_dataloader = DataLoader(nn_training_data, shuffle=True) # data gets shuffled after all points have been iterated through (https://pytorch.org/tutorials/beginner/basics/data_tutorial.html)
-    nn_test_data = income_info(pd_test_data)
-    nn_test_dataloader = DataLoader(nn_test_data, shuffle=True)
 
-    nn_input_width = len(pd_test_data.columns)
+    nn_input_width = len(pd_training_data.columns -1) # -1 column for the label
     nn_width = [10]
     nn_depth = [5]
     EPOCHS = 100
